@@ -26,7 +26,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 require XSLoader;
 XSLoader::load('Text::Tidx', $VERSION);
@@ -38,7 +38,6 @@ sub lookup {
         return lookup_c(@_, "^");
     }
     if (@_ == 4) {
-        die "TODO: support range lookups\n";
         return lookup_cr(@_, "^");
     }
 }
@@ -49,7 +48,6 @@ sub query {
         $r = lookup_c(@_, "^");
     }
     if (@_ == 4) {
-        die "TODO: support range lookups\n";
         $r = lookup_cr(@_, "^");
     }
     return () if (!$r);
@@ -68,10 +66,11 @@ sub build {
     $op{chr} = 1 if !defined($op{chr});
     $op{beg} = 2 if !$op{beg};
     $op{end} = 3 if !$op{end};
-    # one based index, consistend with command-line version
+    # one based index, consistent with command-line version
     --$op{chr};
     --$op{beg};
     --$op{end};
+    # todo... for kicks: allow indexing on text only, no positions
     tidx_build($file, $op{sep}, $op{chr}, $op{beg}, $op{end}, $op{skip_i}, $op{skip_c}, $op{sub_e});
 }
 
@@ -96,10 +95,11 @@ Text::Tidx - Index a delimited text file containing start-stop positions
 
 Loads an index from a file.
 
-=head2 query(CHR, POS)
+=head2 query(CHR, POS [, END])
 
 Query a loaded index, returning an array of text lines corresponding to the specified
-chr string and integer pos.
+chr string and integer pos.   If an end is specified, then all overlapping regions
+are returned.
 
 =head2 build(FILE [, option1=>value1, ...])
 
@@ -158,7 +158,7 @@ to do perl instance, this is expensive, and a database will be faster.
 
 =head1 AUTHOR
 
-Erik Aronesty, E<lt>earonesty@cpan.org<gt>
+Erik Aronesty, E<lt>earonesty@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
