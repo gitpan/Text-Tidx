@@ -28,7 +28,7 @@ template <typename L, typename R> void append(L& lhs, R const& rhs) { lhs.insert
 template <typename L, typename R> void prepend(L& lhs, R const& rhs) { lhs.insert(lhs.begin(), rhs.begin(), rhs.end()); }
 
 struct string_annot_serializer {
-  bool operator()(FILE* fp, const std::pair<const string&, const vector<annot>& >& value) const {
+  bool operator()(FILE* fp, const std::pair<const string&, const vector<annot> >& value) const {
 
     {
     assert(value.first.length() <= UCHAR_MAX);
@@ -200,6 +200,7 @@ string tidx::lookup(const char *chr, int pos, const char *msep) {
         res += msep;
         res += string(l.s, l.n);
     }
+    free_line(&l);
     return res;
 }
 
@@ -222,6 +223,7 @@ string tidx::lookup_r(const char *chr, int beg, int end, const char *msep) {
         res += msep;
         res += string(l.s, l.n);
     }
+    free_line(&l);
     return res;
 }
 
@@ -323,6 +325,8 @@ void tidx::build(const char *in, const char *sep, int nchr, int nbeg, int nend, 
 	}
     dense_hash_map<string,vector<annot> >::iterator it;
 
+    free_line(&l);
+ 
     // for each chromosome
     it = map.begin();
     while (it != map.end()) {

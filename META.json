@@ -4,7 +4,7 @@
       "A. U. Thor <earonesty@>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112621",
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
    "license" : [
       "unknown"
    ],
@@ -35,5 +35,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.93"
+   "version" : "0.94"
 }

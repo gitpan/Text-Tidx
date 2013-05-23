@@ -157,15 +157,17 @@ bool poorqual(int n, int l, const char *s, const char *q) {
         quals[n].ns += ns;
         int xmean = sum/l;
         if (quals[n].cnt < 20000) {
+                // not enough data? use heuristic
                 return ((xmean-33) < 20) || (ns != 0);
         }
+        // enough data? use stdev
         int pmean = quals[n].sum / quals[n].cnt;                                // mean q
         double pdev = stdev(quals[n].cnt, quals[n].sum, quals[n].ssq);          // dev q
-        int serr = max(2,pdev/sqrt(l));                                                // stderr for length l
+        int serr = max(2,pdev/sqrt(l));                                         // stderr for length l
         if (xmean < (pmean - serr)) {                                           // off by 1 stdev?
                 return 1;                                                       // ditch it
         }
-        if (ns > (l*quals[n].ns / quals[n].cnt)) {                                // more n's than average?
+        if (ns > (1+(l*quals[n].ns / quals[n].cnt))) {                          // 1 more n than average?
                 return 1;                                                       // ditch it
         }
         return 0;
@@ -175,8 +177,8 @@ bool poorqual(int n, int l, const char *s, const char *q) {
 
 void revcomp(struct fq *d, struct fq *s) {
         if (!d->seq.s) {
-                d->seq.s=(char *) malloc(d->seq.a=s->seq.n);
-                d->qual.s=(char *) malloc(d->qual.a=s->qual.n);
+                d->seq.s=(char *) malloc(d->seq.a=s->seq.n+1);
+                d->qual.s=(char *) malloc(d->qual.a=s->qual.n+1);
         } else if (d->seq.a <= s->seq.n) {
                 d->seq.s=(char *) realloc(d->seq.s, d->seq.a=(s->seq.n+1));
                 d->qual.s=(char *) realloc(d->qual.s, d->qual.a=(s->qual.n+1));
@@ -199,8 +201,24 @@ void revcomp(struct fq *d, struct fq *s) {
         }
         d->seq.n=s->seq.n;
         d->qual.n=s->qual.n;
-        s->seq.s[s->seq.n]='\0';
-        s->qual.s[s->seq.n]='\0';
+        d->seq.s[s->seq.n]='\0';
+        d->qual.s[s->seq.n]='\0';
+}
+
+void free_line(struct line *l) {
+   if (l) {
+       if (l->s) free(l->s); 
+       l->s=NULL;
+   }
+}
+
+void free_fq(struct fq *f) {
+    if (f) {
+        free_line(&f->id);
+        free_line(&f->seq);
+        free_line(&f->com);
+        free_line(&f->qual);
+    }
 }
 
 
@@ -309,5 +327,6 @@ ssize_t getline(char **lineptr, size_t *n, FILE *stream)
 {
   return getstr (lineptr, n, stream, '\n', 0);
 }
+
 
 #endif

@@ -171,6 +171,7 @@ int main (int argc, char **argv) {
                 fputs(res.c_str(),stdout);                             // echo
                 fputc('\n',stdout);
             }
+            free_line(&l);
         }
 
         for (f_i=0;f_i<vin.size();++f_i) 
@@ -201,6 +202,7 @@ fputs(
 "-i IFILE       Text file to index (can specify more than one)\n"
 "-B             Build index, don't annotate\n"
 "-a FILE        Read text file and annotate\n"
+"-p CHR:POS     Lookup a single point (slow!)\n"
 "-r STRING      Annotation response separator (^)\n"
 "-t CHAR(s)     Field separator (TAB)\n"
 "-c INT         Group by (chromosome) column (1)\n"
